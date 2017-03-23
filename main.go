@@ -4,6 +4,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/joho/godotenv"
+	"gopkg.in/telegram-bot-api.v4"
 )
 
 func main() {
