@@ -26,13 +26,13 @@ func main() {
 
 	log.Printf("Authorized on account %s", bot.Self.UserName)
 
-	_, err = bot.SetWebhook(tgbotapi.NewWebhookWithCert("https://54.179.163.62:8765/", "cert.pem"))
+	_, err = bot.SetWebhook(tgbotapi.NewWebhookWithCert("https://54.179.163.62:8443/", "cert.pem"))
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	updates := bot.ListenForWebhook("/")
-	go http.ListenAndServeTLS("0.0.0.0:8765", "cert.pem", "key.pem", nil)
+	go http.ListenAndServeTLS("0.0.0.0:8443", "cert.pem", "key.pem", nil)
 
 	for update := range updates {
 		log.Printf("%+v\n", update)
