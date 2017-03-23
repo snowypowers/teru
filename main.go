@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/julienschmidt/httprouter"
 	"gopkg.in/telegram-bot-api.v4"
 )
 
@@ -30,11 +32,18 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	updates := bot.ListenForWebhook("/" + bot.Token)
+
+	//Website
+	http.Handle("/", http.FileServer(http.Dir("./website")))
+
 	go http.ListenAndServeTLS("0.0.0.0:8443", "cert.pem", "key.pem", nil)
 
 	for update := range updates {
 		log.Printf("%+v\n", update)
 	}
+}
+
+func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	fmt.Fprint(w, "Welcome!\n")
 }
