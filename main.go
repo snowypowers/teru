@@ -77,5 +77,5 @@ func getWF2(data []byte, args string) string {
 	if err := json.Unmarshal(data, &record); err != nil {
 		log.Println(err)
 	}
-	return "The weather at " + record.Items[1].Forecasts[0].Area + " is " + record.Items[1].Forecasts[0].Forecast
+	return "The weather at " + record.Items[0].Forecasts[0].Area + " is " + record.Items[0].Forecasts[0].Forecast
 }
