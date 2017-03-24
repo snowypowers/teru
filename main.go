@@ -9,7 +9,7 @@ import (
 	"github.com/joho/godotenv"
 	"gopkg.in/telegram-bot-api.v4"
 
-	"github.com/snowypowers/sgweatherbot/store"
+	"github.com/snowypowers/sgweatherbot/poller"
 )
 
 func main() {
@@ -23,8 +23,8 @@ func main() {
 	apiKey := os.Getenv("DATA_API_KEY")
 
 	//Store
-	s := store.Store()
-	wf2 := store.Subscription{
+	s := poller.Poller()
+	wf2 := poller.Subscription{
 		"wf2",
 		"https://api.data.gov.sg/v1/environment/2-hour-weather-forecast",
 		apiKey,
