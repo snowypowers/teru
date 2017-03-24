@@ -23,7 +23,7 @@ type store struct {
 var instance *store
 var once sync.Once
 var subs []Subscription
-var db map[string]string
+var db map[string][]byte
 
 //Store Singleton instance method.
 //Returns a reference to the store object
@@ -34,7 +34,7 @@ func Store() *store {
 		}
 		subs := make([]Subscription, 1)
 		instance = &store{client, subs}
-		db = make(map[string]string)
+		db = make(map[string][]byte)
 	})
 	return instance
 }
@@ -64,26 +64,27 @@ func (a store) Listen(sub Subscription) chan string {
 	return quit
 }
 
-func (a store) Value(sub Subscription) string {
+func (a store) Value(sub Subscription) []byte {
 	return db[sub.Name]
 }
 
 //Retrieve immediately sends an API request and attempts to retrieve the information available.
 //Returns the JSON body in string format.
-func retrieve(sub Subscription) string {
+func retrieve(sub Subscription) []byte {
 	req, err := http.NewRequest("GET", sub.Endpoint, nil)
 	req.Header.Add("api-key", sub.Key)
 	res, err := instance.Client.Do(req)
 
 	if err != nil {
 		log.Fatal(err)
-		return ""
+		return nil
 	} else {
 		defer res.Body.Close()
 		bs, err := ioutil.ReadAll(res.Body)
 		if err != nil {
 			log.Fatal(err)
+			return nil
 		}
-		return string(bs)
+		return bs
 	}
 }
