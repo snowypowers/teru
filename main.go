@@ -56,9 +56,9 @@ func main() {
 		args := update.Message.CommandArguments()
 		out := ""
 		switch cmd {
-		case "/wf2":
+		case "wf2":
 			out = getWF2(s.Value(wf2), args)
-		case "/start":
+		case "start":
 			out = "Hello! Welcome! This bot is under construction!"
 		default:
 			out = "hi"
