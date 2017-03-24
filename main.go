@@ -1,13 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/julienschmidt/httprouter"
 	"gopkg.in/telegram-bot-api.v4"
 )
 
@@ -42,8 +40,4 @@ func main() {
 	for update := range updates {
 		log.Printf("%+v\n", update)
 	}
-}
-
-func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	fmt.Fprint(w, "Welcome!\n")
 }
