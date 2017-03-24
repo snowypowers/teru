@@ -16,6 +16,7 @@ func main() {
 	}
 
 	botToken := os.Getenv("BOT_TOKEN")
+	webLink := os.Getenv("WEBSITE_LINK")
 
 	bot, err := tgbotapi.NewBotAPI(botToken)
 	if err != nil {
@@ -26,7 +27,7 @@ func main() {
 
 	log.Printf("Authorized on account %s", bot.Self.UserName)
 
-	_, err = bot.SetWebhook(tgbotapi.NewWebhookWithCert("https://54.179.163.62/"+bot.Token, "cert.pem"))
+	_, err = bot.SetWebhook(tgbotapi.NewWebhookWithCert(webLink+bot.Token, "cert.pem"))
 	if err != nil {
 		log.Fatal(err)
 	}
