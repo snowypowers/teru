@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"os"
@@ -71,6 +72,10 @@ func main() {
 	close(wf2Close)
 }
 
-func getWF2(data string, args string) string {
-	return "haha"
+func getWF2(data []byte, args string) string {
+	var record WF2
+	if err := json.Unmarshal(data, &record); err != nil {
+		log.Println(err)
+	}
+	return "The weather at " + record.Items[1].Forecasts[0].Area + " is " + record.Items[1].Forecasts[0].Forecast
 }
