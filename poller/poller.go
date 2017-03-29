@@ -1,4 +1,5 @@
 //Package poller provides a polling service to collect data from external API endpoints at regular intervals.
+//Poller also serves as a cache for the latest data.
 package poller
 
 import (
@@ -9,6 +10,7 @@ import (
 	"time"
 )
 
+//Subscription is a struct that poller accepts to start listening to an external endpoint
 type Subscription struct {
 	Name     string `json:"name"`
 	Endpoint string `json:"endpoint"`
@@ -23,7 +25,7 @@ type poller struct {
 
 var instance *poller
 var once sync.Once
-var subs []Subscription
+var subscribers map[string][]func([]byte)
 var db map[string][]byte
 
 //Poller Singleton instance method.
@@ -33,9 +35,10 @@ func Poller() *poller {
 		client := &http.Client{
 			Timeout: time.Second * 10,
 		}
-		subs := make([]Subscription, 1)
-		instance = &poller{client, subs}
+		endpoints := make([]Subscription, 1)
+		instance = &poller{client, endpoints}
 		db = make(map[string][]byte)
+		subscribers = make(map[string][]func([]byte))
 	})
 	return instance
 }
@@ -43,7 +46,7 @@ func Poller() *poller {
 //Listens to a API endpoint, calling it at interval, returning JSON body as string through out.
 //Returns a
 func (a poller) Listen(sub Subscription) chan string {
-	subs = append(subs, sub)
+	instance.Subs = append(instance.Subs, sub)
 	quit := make(chan string)
 	ticker := time.NewTicker(time.Second * time.Duration(sub.Interval))
 	//Initial retrieval
@@ -55,6 +58,10 @@ func (a poller) Listen(sub Subscription) chan string {
 			case <-ticker.C:
 				res := retrieve(sub)
 				db[sub.Name] = res
+				subs := subscribers[sub.Name]
+				for _,i := range subs {
+					i(res)
+				}
 			case <-quit:
 				ticker.Stop()
 				return
@@ -65,8 +72,19 @@ func (a poller) Listen(sub Subscription) chan string {
 	return quit
 }
 
+//Subscribes to a update using a name.
+func (a poller) Subscribe(name string, f func([]byte)) {
+	subscribers[name] = append(subscribers[name], f)
+}
+
+//Returns the last value of the subscription
 func (a poller) Value(sub Subscription) []byte {
 	return db[sub.Name]
+}
+
+//Same as Value but accepts a string
+func (a poller) ValueByName(name string) []byte {
+	return db[name]
 }
 
 //Retrieve immediately sends an API request and attempts to retrieve the information available.

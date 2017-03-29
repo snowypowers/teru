@@ -10,6 +10,7 @@ import (
 	"gopkg.in/telegram-bot-api.v4"
 
 	"github.com/snowypowers/sgweatherbot/poller"
+	"github.com/snowypowers/sgweatherbot/store"
 )
 
 func main() {
@@ -73,9 +74,12 @@ func main() {
 }
 
 func getWF2(data []byte, args string) string {
-	var record WF2
-	if err := json.Unmarshal(data, &record); err != nil {
-		log.Println(err)
+	d := store.ParseWf2(data)
+	a := store.ParseArea(args)
+	if a != "" {
+		f := d.Forecasts[a]
+		return "The weather at " + a + " is " + f
+	} else {
+		return "Sorry, did you spell the area wrongly?"
 	}
-	return "The weather at " + record.Items[0].Forecasts[0].Area + " is " + record.Items[0].Forecasts[0].Forecast
 }
