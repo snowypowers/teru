@@ -54,16 +54,19 @@ func main() {
 		//Command Parsing
 		cmd := update.Message.Command()
 		args := update.Message.CommandArguments()
-		out := ""
+		var msg tgbotapi.MessageConfig
 		switch cmd {
 			case "wf2":
-				out = getWF2(s.Value(wf2), args)
+				msg = processWf2(update, s.Value(wf2), args)
 			case "start":
-				out = "Hello! Welcome! This bot is under construction!"
+				msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Hello! Welcome! This bot is under construction!\nType \\help for instructions!")
+			case "help":
+				msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Use command \\wf2 to get the weather forecast for the next 2 hours")
+			case "about":
+				msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Data retrieved from NEA. Made in Go.")
 			default:
-				out = "hi"
+				msg = tgbotapi.NewMessage(update.Message.Chat.ID, "hi")
 		}
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, out)
 		bot.Send(msg)
 	}
 
@@ -71,19 +74,32 @@ func main() {
 	close(wf2Close)
 }
 
-func getWF2(data []byte, args string) string {
+func processWf2(update tgbotapi.Update, data []byte, args string) tgbotapi.MessageConfig {
 	d := store.ParseWf2(data)
 	a := store.ParseArea(args)
-
-	if a == "All" {
-		return printAllWf2(d)
+	var msg tgbotapi.MessageConfig
+	switch(a) {
+		case "All":
+			msg = tgbotapi.NewMessage(update.Message.Chat.ID, printAllWf2(d))
+		case "":
+			if args == "" {
+				msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Choose a region or type in the area name after \\wf2. \nFor example, \\wf2 Bedok.")
+				msg.ReplyMarkup = wf2FullKb
+			} else {
+				msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Sorry, did you spell the area wrongly?")
+			}
+		default:
+			f := d.Forecasts[a]
+			msg = tgbotapi.NewMessage(update.Message.Chat.ID, "The weather at " + a + " is " + f)
 	}
-	if a != "" {
-		f := d.Forecasts[a]
-		return "The weather at " + a + " is " + f
-	}
-	return "Sorry, did you spell the area wrongly?"
+	return msg
 }
+
+var wf2KbRow1 = tgbotapi.NewKeyboardButtonRow(tgbotapi.NewKeyboardButton("/wf2 all"))
+var wf2KbRow2 = tgbotapi.NewKeyboardButtonRow(tgbotapi.NewKeyboardButton("/wf2 north"))
+var wf2KbRow3 = tgbotapi.NewKeyboardButtonRow(tgbotapi.NewKeyboardButton("/wf2 west"), tgbotapi.NewKeyboardButton("/wf2 central"), tgbotapi.NewKeyboardButton("/wf2 west"))
+var wf2KbRow4 = tgbotapi.NewKeyboardButtonRow(tgbotapi.NewKeyboardButton("/wf2 south"))
+var wf2FullKb = tgbotapi.NewReplyKeyboard(wf2KbRow1, wf2KbRow2, wf2KbRow3, wf2KbRow4)
 
 func printAllWf2(w store.WF2Update) string {
 	s := "Weather for " + w.Timestamp.Format("Mon Jan 2 03:04 PM ") + " \n"
