@@ -106,10 +106,9 @@ func ParseWf2(data []byte) WF2Update {
 //ParseArea parses string into a possible Area.
 //Returns empty string if no matches
 func ParseArea(args string) string {
-
 	sanitised := strings.Trim(args, " .")
 	sanitised = strings.Title(sanitised)
-		if args == "All" {
+	if sanitised == "All" {
 		return "All"
 	}
 
