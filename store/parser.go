@@ -1,79 +1,79 @@
 package store
 
 import (
-	"time"
 	"encoding/json"
 	"log"
 	"strings"
+	"time"
 )
 
 var areaNames = []string{
-"Ang Mo Kio",
-"Bedok",
-"Bishan",
-"Boon Lay",
-"Bukit Batok",
-"Bukit Merah",
-"Bukit Panjang",
-"Bukit Timah",
-"Central Water Catchment",
-"Changi",
-"Choa Chu Kang",
-"Clementi",
-"City",
-"Geylang",
-"Hougang",
-"Jalan Bahar",
-"Jurong East",
-"Jurong Island",
-"Jurong West",
-"Kallang",
-"Lim Chu Kang",
-"Mandai",
-"Marine Parade",
-"Novena",
-"Pasir Ris",
-"Paya Lebar",
-"Pioneer",
-"Pulau Tekong",
-"Pulau Ubin",
-"Punggol",
-"Queenstown",
-"Seletar",
-"Sembawang",
-"Sengkang",
-"Sentosa",
-"Serangoon",
-"Southern Islands",
-"Sungei Kadut",
-"Tampines",
-"Tanglin",
-"Tengah",
-"Toa Payoh",
-"Tuas",
-"Western Islands",
-"Western Water Catchment",
-"Woodlands",
-"Yishun"}
+	"Ang Mo Kio",
+	"Bedok",
+	"Bishan",
+	"Boon Lay",
+	"Bukit Batok",
+	"Bukit Merah",
+	"Bukit Panjang",
+	"Bukit Timah",
+	"Central Water Catchment",
+	"Changi",
+	"Choa Chu Kang",
+	"Clementi",
+	"City",
+	"Geylang",
+	"Hougang",
+	"Jalan Bahar",
+	"Jurong East",
+	"Jurong Island",
+	"Jurong West",
+	"Kallang",
+	"Lim Chu Kang",
+	"Mandai",
+	"Marine Parade",
+	"Novena",
+	"Pasir Ris",
+	"Paya Lebar",
+	"Pioneer",
+	"Pulau Tekong",
+	"Pulau Ubin",
+	"Punggol",
+	"Queenstown",
+	"Seletar",
+	"Sembawang",
+	"Sengkang",
+	"Sentosa",
+	"Serangoon",
+	"Southern Islands",
+	"Sungei Kadut",
+	"Tampines",
+	"Tanglin",
+	"Tengah",
+	"Toa Payoh",
+	"Tuas",
+	"Western Islands",
+	"Western Water Catchment",
+	"Woodlands",
+	"Yishun"}
 
 //WF2 Raw data struct
 type WF2 struct {
 	AreaMetadata []struct {
-		Name string `json:"name"`
+		Name          string `json:"name"`
 		LabelLocation struct {
-			Latitude float64 `json:"latitude"`
+			Latitude  float64 `json:"latitude"`
 			Longitude float64 `json:"longitude"`
 		} `json:"label_location"`
 	} `json:"area_metadata"`
 	Items []struct {
 		UpdateTimestamp time.Time `json:"update_timestamp"`
-		Timestamp time.Time `json:"timestamp"`
-		ValidPeriod struct {
+		Timestamp       time.Time `json:"timestamp"`
+		ValidPeriod     struct {
 			Start time.Time `json:"start"`
-			End time.Time `json:"end"`
+			End   time.Time `json:"end"`
 		} `json:"valid_period"`
 		Forecasts []struct {
-			Area string `json:"area"`
+			Area     string `json:"area"`
 			Forecast string `json:"forecast"`
 		} `json:"forecasts"`
 	} `json:"items"`
@@ -97,7 +97,7 @@ func ParseWf2(data []byte) WF2Update {
 	ts := record.Items[0].Timestamp
 	forecasts := make(map[string]string)
 	update := WF2Update{ts, forecasts}
-	for _,i := range record.Items[0].Forecasts {
+	for _, i := range record.Items[0].Forecasts {
 		forecasts[i.Area] = i.Forecast
 	}
 	return update
@@ -108,13 +108,20 @@ func ParseWf2(data []byte) WF2Update {
 func ParseArea(args string) string {
 	sanitised := strings.Trim(args, " .")
 	sanitised = strings.Title(sanitised)
-	if sanitised == "All" {
-		return "All"
-	}
-
-	for _,i:= range areaNames {
-		if sanitised == i {
-			return i
+	switch sanitised {
+	case "North":
+	case "South":
+	case "East":
+	case "West":
+	case "Central":
+	case "All":
+	case "":
+		return sanitised
+	default:
+		for _, i := range areaNames {
+			if sanitised == i {
+				return i
+			}
 		}
 	}
 	return ""
