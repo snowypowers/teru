@@ -86,7 +86,7 @@ func getWF2(data []byte, args string) string {
 }
 
 func printAllWf2(w store.WF2Update) string {
-	s := "Weather for " + w.Timestamp.Format("Mon Jan 2 3:03PM") + ": \n"
+	s := "Weather for " + w.Timestamp.Format("Mon Jan 2 03:04 PM ") + " \n"
 	for k,v:= range w.Forecasts {
 		s += k + ": " + v + "\n"
 	}
