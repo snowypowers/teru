@@ -82,6 +82,7 @@ type WF2 struct {
 	} `json:"api_info"`
 }
 
+//WF2Update parsed formatted data
 type WF2Update struct {
 	Timestamp time.Time
 	Forecasts map[string]string
@@ -105,8 +106,13 @@ func ParseWf2(data []byte) WF2Update {
 //ParseArea parses string into a possible Area.
 //Returns empty string if no matches
 func ParseArea(args string) string {
+
 	sanitised := strings.Trim(args, " .")
 	sanitised = strings.Title(sanitised)
+		if args == "All" {
+		return "All"
+	}
+
 	for _,i:= range areaNames {
 		if sanitised == i {
 			return i

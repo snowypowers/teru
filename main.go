@@ -56,12 +56,12 @@ func main() {
 		args := update.Message.CommandArguments()
 		out := ""
 		switch cmd {
-		case "wf2":
-			out = getWF2(s.Value(wf2), args)
-		case "start":
-			out = "Hello! Welcome! This bot is under construction!"
-		default:
-			out = "hi"
+			case "wf2":
+				out = getWF2(s.Value(wf2), args)
+			case "start":
+				out = "Hello! Welcome! This bot is under construction!"
+			default:
+				out = "hi"
 		}
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, out)
 		bot.Send(msg)
@@ -74,11 +74,21 @@ func main() {
 func getWF2(data []byte, args string) string {
 	d := store.ParseWf2(data)
 	a := store.ParseArea(args)
-	log.Printf("Area: %s", a)
+
+	if a == "All" {
+		return printAllWf2(d)
+	}
 	if a != "" {
 		f := d.Forecasts[a]
 		return "The weather at " + a + " is " + f
-	} else {
-		return "Sorry, did you spell the area wrongly?"
 	}
+	return "Sorry, did you spell the area wrongly?"
+}
+
+func printAllWf2(w store.WF2Update) string {
+	s := "Weather for " + w.Timestamp.Format("Mon Jan 2 3:03PM") + ": \n"
+	for k,v:= range w.Forecasts {
+		s += k + ": " + v + "\n"
+	}
+	return s
 }
