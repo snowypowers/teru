@@ -61,4 +61,8 @@ var wf2KbRow1 = tgbotapi.NewKeyboardButtonRow(tgbotapi.NewKeyboardButton("/wf2 a
 var wf2KbRow2 = tgbotapi.NewKeyboardButtonRow(tgbotapi.NewKeyboardButton("/wf2 north"))
 var wf2KbRow3 = tgbotapi.NewKeyboardButtonRow(tgbotapi.NewKeyboardButton("/wf2 west"), tgbotapi.NewKeyboardButton("/wf2 central"), tgbotapi.NewKeyboardButton("/wf2 west"))
 var wf2KbRow4 = tgbotapi.NewKeyboardButtonRow(tgbotapi.NewKeyboardButton("/wf2 south"))
-var wf2FullKb = tgbotapi.NewReplyKeyboard(wf2KbRow1, wf2KbRow2, wf2KbRow3, wf2KbRow4)
+var wf2FullKb = tgbotapi.ReplyKeyboardMarkup{
+	[][]tgbotapi.KeyboardButton{wf2KbRow1, wf2KbRow2, wf2KbRow3, wf2KbRow4},
+	true,
+	true,
+	false}
