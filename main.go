@@ -82,11 +82,7 @@ func processWf2(update tgbotapi.Update, data []byte, args string) tgbotapi.Messa
 	switch(a) {
 		case "All":
 			msg = tgbotapi.NewMessage(update.Message.Chat.ID, printAllWf2(d))
-		case "North":
-		case "South":
-		case "East":
-		case "West":
-		case "Central":
+		case "North", "South", "East", "West", "Central":
 			msg = tgbotapi.NewMessage(update.Message.Chat.ID, printAreaWf2(d, a))
 		case "":
 			if args == "" {

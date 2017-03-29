@@ -109,13 +109,7 @@ func ParseArea(args string) string {
 	sanitised := strings.Trim(args, " .")
 	sanitised = strings.Title(sanitised)
 	switch sanitised {
-	case "North":
-	case "South":
-	case "East":
-	case "West":
-	case "Central":
-	case "All":
-	case "":
+	case "North", "South", "East", "West", "Central", "All", "":
 		return sanitised
 	default:
 		for _, i := range areaNames {
