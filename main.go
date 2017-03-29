@@ -109,7 +109,7 @@ func printAllWf2(w store.WF2Update) string {
 func printAreaWf2(w store.WF2Update, area string) string {
 	s := "The 2 hour Nowcast for " + area + " at " + w.Timestamp.Format("Mon Jan 2 03:04 PM ") + " \n"
 	for _,v := range regions[area] {
-		s += v + ": " + w.Forecasts[v]
+		s += v + ": " + w.Forecasts[v] + "\n"
 	}
 	return s
 }
