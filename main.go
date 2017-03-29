@@ -63,7 +63,6 @@ func main() {
 		default:
 			out = "hi"
 		}
-		log.Printf("%+v\n", update.Message)
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, out)
 		bot.Send(msg)
 	}
@@ -75,6 +74,7 @@ func main() {
 func getWF2(data []byte, args string) string {
 	d := store.ParseWf2(data)
 	a := store.ParseArea(args)
+	log.Printf("Area: %s", a)
 	if a != "" {
 		f := d.Forecasts[a]
 		return "The weather at " + a + " is " + f
