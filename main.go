@@ -77,10 +77,17 @@ func main() {
 func processWf2(update tgbotapi.Update, data []byte, args string) tgbotapi.MessageConfig {
 	d := store.ParseWf2(data)
 	a := store.ParseArea(args)
+	log.Printf("args: %s", a)
 	var msg tgbotapi.MessageConfig
 	switch(a) {
 		case "All":
 			msg = tgbotapi.NewMessage(update.Message.Chat.ID, printAllWf2(d))
+		case "North":
+		case "South":
+		case "East":
+		case "West":
+		case "Central":
+			msg = tgbotapi.NewMessage(update.Message.Chat.ID, printAreaWf2(d, a))
 		case "":
 			if args == "" {
 				msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Choose a region or type in the area name after \\wf2. \nFor example, \\wf2 Bedok.")
@@ -95,16 +102,18 @@ func processWf2(update tgbotapi.Update, data []byte, args string) tgbotapi.Messa
 	return msg
 }
 
-var wf2KbRow1 = tgbotapi.NewKeyboardButtonRow(tgbotapi.NewKeyboardButton("/wf2 all"))
-var wf2KbRow2 = tgbotapi.NewKeyboardButtonRow(tgbotapi.NewKeyboardButton("/wf2 north"))
-var wf2KbRow3 = tgbotapi.NewKeyboardButtonRow(tgbotapi.NewKeyboardButton("/wf2 west"), tgbotapi.NewKeyboardButton("/wf2 central"), tgbotapi.NewKeyboardButton("/wf2 west"))
-var wf2KbRow4 = tgbotapi.NewKeyboardButtonRow(tgbotapi.NewKeyboardButton("/wf2 south"))
-var wf2FullKb = tgbotapi.NewReplyKeyboard(wf2KbRow1, wf2KbRow2, wf2KbRow3, wf2KbRow4)
-
 func printAllWf2(w store.WF2Update) string {
 	s := "Weather for " + w.Timestamp.Format("Mon Jan 2 03:04 PM ") + " \n"
 	for k,v:= range w.Forecasts {
 		s += k + ": " + v + "\n"
+	}
+	return s
+}
+
+func printAreaWf2(w store.WF2Update, area string) string {
+	s := "The 2 hour Nowcast for " + area + " at " + w.Timestamp.Format("Mon Jan 2 03:04 PM ") + " \n"
+	for _,v := range regions[area] {
+		s += v + ": " + w.Forecasts[v]
 	}
 	return s
 }
