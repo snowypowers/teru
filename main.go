@@ -18,7 +18,7 @@ import (
 )
 
 
-var nlpToken = os.Getenv("NLP_TOKEN")
+var nlpToken, botToken, webLink, apiKey string
 var client = &http.Client{Timeout: time.Second * 10}
 
 func main() {
@@ -27,9 +27,10 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	botToken := os.Getenv("BOT_TOKEN")
-	webLink := os.Getenv("WEBSITE_LINK")
-	apiKey := os.Getenv("DATA_API_KEY")
+	botToken = os.Getenv("BOT_TOKEN")
+	webLink = os.Getenv("WEBSITE_LINK")
+	apiKey = os.Getenv("DATA_API_KEY")
+	nlpToken = os.Getenv("NLP_TOKEN")
 
 	//Store
 	s := poller.Poller(client)
@@ -88,6 +89,7 @@ func main() {
 
 func processNLP(update tgbotapi.Update) tgbotapi.MessageConfig {
 	req := constructNLPReq(update)
+	log.Printf("NLP REQ: %v+", req)
 	res, err := client.Do(req)
 	if err != nil {
 		log.Panic(err)
