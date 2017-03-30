@@ -87,7 +87,7 @@ func processUpdate(update tgbotapi.Update, ctx context) {
 	args := update.Message.CommandArguments()
 	var msg tgbotapi.MessageConfig
 	switch cmd {
-		case "wf2":
+		case "w", "weather", "wf2":
 			msg = processWf2(update, ctx.poller.ValueByName("wf2"), args)
 		case "start":
 			msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Hello! Welcome! This bot is under construction!\nType \\help for instructions!")
