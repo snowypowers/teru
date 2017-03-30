@@ -90,7 +90,7 @@ func processUpdate(update tgbotapi.Update, ctx context) {
 		case "w", "weather", "wf2":
 			msg = processWf2(update, ctx.poller.ValueByName("wf2"), args)
 		case "start":
-			msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Hello! Welcome! This bot is under construction!\nType /elp for instructions!")
+			msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Hello!\nI am Teru!\n I provide 2 hour nowcasts of the weather in Singapore!This data is provided by NEA.\n To get the weather at a certain area, type /w <area name>.\nType /help for instructions!")
 		case "help":
 			msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Use command /w to get the weather forecast for the next 2 hours")
 		case "about":
