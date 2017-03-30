@@ -30,6 +30,14 @@ type nlpResponse struct {
 	SessionID string `json:"sessionId"`
 }
 
+type nlpRequest struct {
+	Query string `json:"query"`
+	SessionID string `json:"sessionId"`
+	Lang string `json:"lang"`
+	V int `json:"v"`
+}
+
+
 var regions = map[string][]string{
 	"North":[]string{
 		"Lim Chu Kang",

@@ -102,7 +102,8 @@ func processNLP(update tgbotapi.Update) tgbotapi.MessageConfig {
 }
 
 func constructNLPReq(update tgbotapi.Update) *http.Request {
-	body := []byte(`{query:"", lang:"en", v: 20170101, sessionId: "" }`)
+	nlpBody := nlpRequest{update.Message.Text, string(update.Message.Chat.ID), "en", 20170101}
+	body, err := json.Marshal(nlpBody)
 	req, err := http.NewRequest("POST", "https://api.api.ai/v1/query", bytes.NewBuffer(body))
 	if err != nil {
 		log.Panic(err)
