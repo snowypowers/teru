@@ -91,10 +91,10 @@ var regions = map[string][]string{
 		"Serangoon",
 		"Toa Payoh"}}
 
-var wf2KbRow1 = tgbotapi.NewKeyboardButtonRow(tgbotapi.NewKeyboardButton("/wf2 all"))
-var wf2KbRow2 = tgbotapi.NewKeyboardButtonRow(tgbotapi.NewKeyboardButton("/wf2 north"))
-var wf2KbRow3 = tgbotapi.NewKeyboardButtonRow(tgbotapi.NewKeyboardButton("/wf2 west"), tgbotapi.NewKeyboardButton("/wf2 central"), tgbotapi.NewKeyboardButton("/wf2 west"))
-var wf2KbRow4 = tgbotapi.NewKeyboardButtonRow(tgbotapi.NewKeyboardButton("/wf2 south"))
+var wf2KbRow1 = tgbotapi.NewKeyboardButtonRow(tgbotapi.NewKeyboardButton("/w all"))
+var wf2KbRow2 = tgbotapi.NewKeyboardButtonRow(tgbotapi.NewKeyboardButton("/w north"))
+var wf2KbRow3 = tgbotapi.NewKeyboardButtonRow(tgbotapi.NewKeyboardButton("/w west"), tgbotapi.NewKeyboardButton("/w central"), tgbotapi.NewKeyboardButton("/w west"))
+var wf2KbRow4 = tgbotapi.NewKeyboardButtonRow(tgbotapi.NewKeyboardButton("/w south"))
 var wf2FullKb = tgbotapi.ReplyKeyboardMarkup{
 	[][]tgbotapi.KeyboardButton{wf2KbRow1, wf2KbRow2, wf2KbRow3, wf2KbRow4},
 	true,
