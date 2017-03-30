@@ -106,6 +106,7 @@ func constructNLPReq(update tgbotapi.Update) *http.Request {
 	body, err := json.Marshal(nlpBody)
 	req, err := http.NewRequest("POST", "https://api.api.ai/v1/query", bytes.NewBuffer(body))
 	if err != nil {
+		log.Println("constructNLPReq ERROR")
 		log.Panic(err)
 	}
 	req.Header.Set("Authorization", "Bearer " + nlpToken)
@@ -114,6 +115,7 @@ func constructNLPReq(update tgbotapi.Update) *http.Request {
 }
 
 func nlpRespToMsg(update tgbotapi.Update, res nlpResponse) tgbotapi.MessageConfig {
+	log.Printf("NLP RESP: %v+", res)
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, res.Result.Speech)
 	return msg
 }
