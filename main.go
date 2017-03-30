@@ -106,7 +106,6 @@ func processUpdate(update tgbotapi.Update, ctx context) {
 
 func processNLP(update tgbotapi.Update) tgbotapi.MessageConfig {
 	req := constructNLPReq(update)
-	log.Printf("NLP REQ: %v+", req)
 	res, err := client.Do(req)
 	if err != nil {
 		log.Panic(err)
@@ -125,7 +124,6 @@ func constructNLPReq(update tgbotapi.Update) *http.Request {
 	body, err := json.Marshal(nlpBody)
 	req, err := http.NewRequest("POST", "https://api.api.ai/v1/query", bytes.NewBuffer(body))
 	if err != nil {
-		log.Println("constructNLPReq ERROR")
 		log.Panic(err)
 	}
 	req.Header.Set("Authorization", "Bearer " + nlpToken)
