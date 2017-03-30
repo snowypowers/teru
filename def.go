@@ -8,17 +8,24 @@ import (
 type nlpResponse struct {
 	ID string `json:"id"`
 	Timestamp time.Time `json:"timestamp"`
+	Lang string `json:"lang"`
 	Result struct {
 		Source string `json:"source"`
 		ResolvedQuery string `json:"resolvedQuery"`
 		Speech string `json:"speech"`
 		Action string `json:"action"`
 		Parameters struct {
+			Area string `json:"area"`
+			Command string `json:"command"`
 			Simplified string `json:"simplified"`
 		} `json:"parameters"`
 		Metadata struct {
 			InputContexts []interface{} `json:"inputContexts"`
 			OutputContexts []interface{} `json:"outputContexts"`
+			IntentName string `json:"intentName"`
+			IntentID string `json:"intentId"`
+			WebhookUsed string `json:"webhookUsed"`
+			WebhookForSlotFillingUsed string `json:"webhookForSlotFillingUsed"`
 			Contexts []interface{} `json:"contexts"`
 		} `json:"metadata"`
 		Score int `json:"score"`

@@ -90,11 +90,11 @@ func processUpdate(update tgbotapi.Update, ctx context) {
 		case "w", "weather", "wf2":
 			msg = processWf2(update, ctx.poller.ValueByName("wf2"), args)
 		case "start":
-			msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Hello! Welcome! This bot is under construction!\nType \\help for instructions!")
+			msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Hello! Welcome! This bot is under construction!\nType /elp for instructions!")
 		case "help":
-			msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Use command \\wf2 to get the weather forecast for the next 2 hours")
+			msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Use command /w to get the weather forecast for the next 2 hours")
 		case "about":
-			msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Data retrieved from NEA. Made in Go.")
+			msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Data retrieved from NEA. Conversations powered by API.ai, Coded in Go.")
 		case "":
 			//No cmds. Forward req to API.AI
 			msg = processNLP(update)
@@ -149,7 +149,7 @@ func processWf2(update tgbotapi.Update, data []byte, args string) tgbotapi.Messa
 			msg = tgbotapi.NewMessage(update.Message.Chat.ID, printAreaWf2(d, a))
 		case "":
 			if args == "" {
-				msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Choose a region or type in the area name after \\wf2. \nFor example, \\wf2 Bedok.")
+				msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Choose a region or type in the area name after /w. \nFor example, /w Bedok.")
 				msg.ReplyMarkup = wf2FullKb
 			} else {
 				msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Sorry, did you spell the area wrongly?")
