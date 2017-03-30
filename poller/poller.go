@@ -30,13 +30,10 @@ var db map[string][]byte
 
 //Poller Singleton instance method.
 //Returns a reference to the poller object
-func Poller() *poller {
+func Poller( c *http.Client) *poller {
 	once.Do(func() {
-		client := &http.Client{
-			Timeout: time.Second * 10,
-		}
 		endpoints := make([]Subscription, 1)
-		instance = &poller{client, endpoints}
+		instance = &poller{c, endpoints}
 		db = make(map[string][]byte)
 		subscribers = make(map[string][]func([]byte))
 	})

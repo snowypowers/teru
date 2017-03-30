@@ -3,14 +3,23 @@ package main
 import (
 	"log"
 	"net/http"
+	"bytes"
 	"os"
+	"time"
+	"io/ioutil"
+	"encoding/json"
 
 	"github.com/joho/godotenv"
 	"gopkg.in/telegram-bot-api.v4"
 
 	"github.com/snowypowers/sgweatherbot/poller"
 	"github.com/snowypowers/sgweatherbot/store"
+
 )
+
+
+var nlpToken = os.Getenv("NLP_TOKEN")
+var client = &http.Client{Timeout: time.Second * 10}
 
 func main() {
 	err := godotenv.Load()
@@ -23,7 +32,7 @@ func main() {
 	apiKey := os.Getenv("DATA_API_KEY")
 
 	//Store
-	s := poller.Poller()
+	s := poller.Poller(client)
 	wf2 := poller.Subscription{
 		"wf2",
 		"https://api.data.gov.sg/v1/environment/2-hour-weather-forecast",
@@ -32,7 +41,7 @@ func main() {
 	wf2Close := s.Listen(wf2)
 
 	//Bot
-	bot, err := tgbotapi.NewBotAPI(botToken)
+	bot, err := tgbotapi.NewBotAPIWithClient(botToken, client)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -64,14 +73,48 @@ func main() {
 				msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Use command \\wf2 to get the weather forecast for the next 2 hours")
 			case "about":
 				msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Data retrieved from NEA. Made in Go.")
+			case "":
+				//No cmds. Forward req to API.AI
+				msg = processNLP(update)
 			default:
-				msg = tgbotapi.NewMessage(update.Message.Chat.ID, "hi")
+				msg = tgbotapi.NewMessage(update.Message.Chat.ID, "huh?")
 		}
 		bot.Send(msg)
 	}
 
 	//Teardown
 	close(wf2Close)
+}
+
+func processNLP(update tgbotapi.Update) tgbotapi.MessageConfig {
+	req := constructNLPReq(update)
+	res, err := client.Do(req)
+	if err != nil {
+		log.Panic(err)
+	}
+	defer res.Body.Close()
+	bs, err := ioutil.ReadAll(res.Body)
+	var resBody nlpResponse
+	if err := json.Unmarshal(bs, &resBody); err != nil {
+		log.Println(err)
+	}
+	return nlpRespToMsg(update, resBody)
+}
+
+func constructNLPReq(update tgbotapi.Update) *http.Request {
+	body := []byte(`{query:"", lang:"en", v: 20170101, sessionId: "" }`)
+	req, err := http.NewRequest("POST", "https://api.api.ai/v1/query", bytes.NewBuffer(body))
+	if err != nil {
+		log.Panic(err)
+	}
+	req.Header.Set("Authorization", "Bearer " + nlpToken)
+	req.Header.Set("Content-Type", "application/json")
+	return req
+}
+
+func nlpRespToMsg(update tgbotapi.Update, res nlpResponse) tgbotapi.MessageConfig {
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, res.Result.Speech)
+	return msg
 }
 
 func processWf2(update tgbotapi.Update, data []byte, args string) tgbotapi.MessageConfig {

@@ -1,8 +1,34 @@
 package main
 
 import (
+	"time"
 	"gopkg.in/telegram-bot-api.v4"
 )
+
+type nlpResponse struct {
+	ID string `json:"id"`
+	Timestamp time.Time `json:"timestamp"`
+	Result struct {
+		Source string `json:"source"`
+		ResolvedQuery string `json:"resolvedQuery"`
+		Speech string `json:"speech"`
+		Action string `json:"action"`
+		Parameters struct {
+			Simplified string `json:"simplified"`
+		} `json:"parameters"`
+		Metadata struct {
+			InputContexts []interface{} `json:"inputContexts"`
+			OutputContexts []interface{} `json:"outputContexts"`
+			Contexts []interface{} `json:"contexts"`
+		} `json:"metadata"`
+		Score int `json:"score"`
+	} `json:"result"`
+	Status struct {
+		Code int `json:"code"`
+		ErrorType string `json:"errorType"`
+	} `json:"status"`
+	SessionID string `json:"sessionId"`
+}
 
 var regions = map[string][]string{
 	"North":[]string{
