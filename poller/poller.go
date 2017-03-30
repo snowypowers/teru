@@ -18,22 +18,22 @@ type Subscription struct {
 	Interval int    `json:"interval"`
 }
 
-type poller struct {
+type Poller struct {
 	Client *http.Client
 	Subs   []Subscription
 }
 
-var instance *poller
+var instance *Poller
 var once sync.Once
 var subscribers map[string][]func([]byte)
 var db map[string][]byte
 
 //Poller Singleton instance method.
 //Returns a reference to the poller object
-func Poller( c *http.Client) *poller {
+func NewPoller( c *http.Client) *Poller {
 	once.Do(func() {
 		endpoints := make([]Subscription, 1)
-		instance = &poller{c, endpoints}
+		instance = &Poller{c, endpoints}
 		db = make(map[string][]byte)
 		subscribers = make(map[string][]func([]byte))
 	})
@@ -42,7 +42,7 @@ func Poller( c *http.Client) *poller {
 
 //Listens to a API endpoint, calling it at interval, returning JSON body as string through out.
 //Returns a
-func (a poller) Listen(sub Subscription) chan string {
+func (a Poller) Listen(sub Subscription) chan string {
 	instance.Subs = append(instance.Subs, sub)
 	quit := make(chan string)
 	ticker := time.NewTicker(time.Second * time.Duration(sub.Interval))
@@ -70,17 +70,17 @@ func (a poller) Listen(sub Subscription) chan string {
 }
 
 //Subscribes to a update using a name.
-func (a poller) Subscribe(name string, f func([]byte)) {
+func (a Poller) Subscribe(name string, f func([]byte)) {
 	subscribers[name] = append(subscribers[name], f)
 }
 
 //Returns the last value of the subscription
-func (a poller) Value(sub Subscription) []byte {
+func (a Poller) Value(sub Subscription) []byte {
 	return db[sub.Name]
 }
 
 //Same as Value but accepts a string
-func (a poller) ValueByName(name string) []byte {
+func (a Poller) ValueByName(name string) []byte {
 	return db[name]
 }
 

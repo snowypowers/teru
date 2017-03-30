@@ -21,6 +21,11 @@ import (
 var nlpToken, botToken, webLink, apiKey string
 var client = &http.Client{Timeout: time.Second * 10}
 
+type context struct{
+	poller *poller.Poller
+	reply chan tgbotapi.MessageConfig
+}
+
 func main() {
 	err := godotenv.Load()
 	if err != nil {
@@ -32,14 +37,14 @@ func main() {
 	apiKey = os.Getenv("DATA_API_KEY")
 	nlpToken = os.Getenv("NLP_TOKEN")
 
-	//Store
-	s := poller.Poller(client)
+	//Poller
+	p := poller.NewPoller(client)
 	wf2 := poller.Subscription{
 		"wf2",
 		"https://api.data.gov.sg/v1/environment/2-hour-weather-forecast",
 		apiKey,
 		300}
-	wf2Close := s.Listen(wf2)
+	wf2Close := p.Listen(wf2)
 
 	//Bot
 	bot, err := tgbotapi.NewBotAPIWithClient(botToken, client)
@@ -54,37 +59,49 @@ func main() {
 		log.Fatal(err)
 	}
 	updates := bot.ListenForWebhook("/" + bot.Token)
-
 	//Website
 	http.Handle("/", http.FileServer(http.Dir("./website")))
 
 	go http.ListenAndServeTLS("0.0.0.0:8443", "cert.pem", "key.pem", nil)
 
-	for update := range updates {
-		//Command Parsing
-		cmd := update.Message.Command()
-		args := update.Message.CommandArguments()
-		var msg tgbotapi.MessageConfig
-		switch cmd {
-			case "wf2":
-				msg = processWf2(update, s.Value(wf2), args)
-			case "start":
-				msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Hello! Welcome! This bot is under construction!\nType \\help for instructions!")
-			case "help":
-				msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Use command \\wf2 to get the weather forecast for the next 2 hours")
-			case "about":
-				msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Data retrieved from NEA. Made in Go.")
-			case "":
-				//No cmds. Forward req to API.AI
-				msg = processNLP(update)
-			default:
-				msg = tgbotapi.NewMessage(update.Message.Chat.ID, "huh?")
+	//Cmd Handling
+	reply := make(chan tgbotapi.MessageConfig)
+	ctx := context{p, reply}
+
+	for {
+		select {
+			case u:= <-updates:
+				go processUpdate(u, ctx)
+			case r := <-reply:
+				bot.Send(r)
 		}
-		bot.Send(msg)
 	}
 
 	//Teardown
 	close(wf2Close)
+}
+
+func processUpdate(update tgbotapi.Update, ctx context) {
+	//Command Parsing
+	cmd := update.Message.Command()
+	args := update.Message.CommandArguments()
+	var msg tgbotapi.MessageConfig
+	switch cmd {
+		case "wf2":
+			msg = processWf2(update, ctx.poller.ValueByName("wf2"), args)
+		case "start":
+			msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Hello! Welcome! This bot is under construction!\nType \\help for instructions!")
+		case "help":
+			msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Use command \\wf2 to get the weather forecast for the next 2 hours")
+		case "about":
+			msg = tgbotapi.NewMessage(update.Message.Chat.ID, "Data retrieved from NEA. Made in Go.")
+		case "":
+			//No cmds. Forward req to API.AI
+			msg = processNLP(update)
+		default:
+			msg = tgbotapi.NewMessage(update.Message.Chat.ID, "huh?")
+	}
+	ctx.reply <- msg
 }
 
 func processNLP(update tgbotapi.Update) tgbotapi.MessageConfig {
